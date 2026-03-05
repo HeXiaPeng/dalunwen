@@ -1,5 +1,6 @@
 const aiClient = require("../utils/aiClient");
 const { ALI_LLM_CONFIG } = require("../config/aiConfig");
+const { processMessage } = require("../mcp/agent_service");
 
 // Initialize OpenAI client with Aliyun endpoint
 // const openai = new OpenAI({
@@ -41,6 +42,35 @@ async function generateProtocol(ctx) {
   }
 }
 
+async function chatWithAgent(ctx) {
+  try {
+    const { message } = ctx.request.body;
+
+    if (!message) {
+      ctx.status = 400;
+      ctx.body = { code: 400, msg: "Message is required" };
+      return;
+    }
+
+    const reply = await processMessage(message);
+
+    ctx.status = 200;
+    ctx.body = {
+      code: 200,
+      msg: "Success",
+      data: reply,
+    };
+  } catch (error) {
+    console.error("Agent Error:", error);
+    ctx.status = 500;
+    ctx.body = {
+      code: 500,
+      msg: `Agent failed: ${error.message}`,
+    };
+  }
+}
+
 module.exports = {
   generateProtocol,
+  chatWithAgent,
 };

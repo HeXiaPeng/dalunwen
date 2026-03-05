@@ -48,7 +48,7 @@
 
           <el-menu-item index="/dashboard/ct-trend">
             <el-icon><Document /></el-icon>
-            <span>临床试验趋势分析</span>
+            <span>智能分析与可视化</span>
           </el-menu-item>
         </el-menu>
       </div>

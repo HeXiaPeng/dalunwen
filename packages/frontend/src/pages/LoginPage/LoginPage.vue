@@ -109,30 +109,56 @@ const handleToRegisterPage = () => {
 
 <style scoped lang="less">
 .simple-login-container {
-  width: 100vw;
-  height: 100vh;
-  background-color: #f5f7fa;
+  width: 100%;
+  min-height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 8px;
 }
 
 .login-card {
   width: 100%;
   max-width: 380px;
-  background: #fff;
-  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(18, 24, 54, 0.72) 0%, rgba(10, 12, 30, 0.56) 100%) padding-box,
+    linear-gradient(135deg, rgba(96, 165, 250, 0.75) 0%, rgba(34, 211, 238, 0.35) 35%, rgba(168, 85, 247, 0.7) 75%, rgba(59, 130, 246, 0.55) 100%) border-box;
+  border-radius: 14px;
   padding: 36px 32px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 26px 80px rgba(0, 0, 0, 0.45),
+    0 10px 22px rgba(0, 0, 0, 0.25);
+  border: 1px solid transparent;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(700px 260px at 20% 0%, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 58%),
+    radial-gradient(520px 220px at 100% 10%, rgba(34, 211, 238, 0.18) 0%, rgba(34, 211, 238, 0) 55%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.login-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .login-title {
   font-size: 20px;
   font-weight: 600;
-  color: #1d2129;
+  color: rgba(235, 244, 255, 0.92);
   text-align: center;
   margin-bottom: 28px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
 .login-form {
@@ -156,7 +182,43 @@ const handleToRegisterPage = () => {
     height: 44px;
     font-size: 16px;
     border-radius: 6px;
+    border: 0;
+    background: linear-gradient(90deg, rgba(79, 70, 229, 0.95) 0%, rgba(59, 130, 246, 0.92) 40%, rgba(6, 182, 212, 0.92) 100%);
+    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.25);
   }
+}
+
+.login-card :deep(.el-form-item) {
+  margin-bottom: 14px;
+}
+
+.login-card :deep(.el-input__wrapper) {
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: none;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.login-card :deep(.el-input__wrapper.is-focus) {
+  border-color: rgba(34, 211, 238, 0.55);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.16);
+}
+
+.login-card :deep(.el-input__inner) {
+  color: rgba(235, 244, 255, 0.92);
+}
+
+.login-card :deep(.el-input__inner::placeholder) {
+  color: rgba(235, 244, 255, 0.55);
+}
+
+.login-card :deep(.el-link) {
+  color: rgba(235, 244, 255, 0.78);
+}
+
+.login-card :deep(.el-link:hover) {
+  color: rgba(34, 211, 238, 0.92);
 }
 
 @media (max-width: 375px) {

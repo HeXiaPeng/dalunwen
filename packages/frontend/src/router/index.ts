@@ -86,7 +86,7 @@ const router = createRouter({
         path: 'ct-trend',
         name: 'ct-trend',
         component: () => import('@/pages/DashBoard/components/ClinicalTrialsTrend.vue'),
-        meta: { breadcrumb: '临床试验趋势分析' }
+        meta: { breadcrumb: '智能分析与可视化' }
       }
       ]
     }

@@ -134,7 +134,7 @@ def generate_treatment_plot(df: pd.DataFrame) -> str:
     y_data = registration_counts.fillna(0).astype(int).values
     x_data = [str(year) for year in registration_counts.index]
     
-    bar = Bar(init_opts=opts.InitOpts(width="100%", height="500px"))
+    bar = Bar(init_opts=opts.InitOpts(width="100%", height="560px"))
     bar.add_xaxis(x_data)
     
     for confirmed in confirmed_counts.columns:
@@ -149,7 +149,15 @@ def generate_treatment_plot(df: pd.DataFrame) -> str:
         xaxis_opts=opts.AxisOpts(name="Year of first public information", name_location="center", name_gap=30),
         yaxis_opts=opts.AxisOpts(name="Number of Trials", name_location="center", name_gap=30),
         tooltip_opts=opts.TooltipOpts(trigger="axis"),
-        legend_opts=opts.LegendOpts(pos_right="10%", pos_top="13%", orient="vertical")
+        legend_opts=opts.LegendOpts(
+            type_="scroll",
+            pos_right="0%",
+            pos_top="12%",
+            orient="vertical",
+            item_width=12,
+            item_height=8,
+            textstyle_opts=opts.TextStyleOpts(font_size=11)
+        )
     )
     
     line = Line().add_xaxis(x_data).add_yaxis("Total trials", y_data.tolist(), is_smooth=True, symbol="circle")
@@ -443,7 +451,7 @@ def generate_survival_plots(df: pd.DataFrame) -> str:
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),
                 xaxis_opts=opts.AxisOpts(name="Days"),
                 yaxis_opts=opts.AxisOpts(name="Survival Probability"),
-                legend_opts=opts.LegendOpts(type_="scroll", pos_right="5%", orient="vertical")
+                legend_opts=opts.LegendOpts(type_="scroll", pos_right="0%", orient="vertical")
             )
             tab.add(line, cat_var)
             

@@ -24,6 +24,77 @@ function getRegistryConfig(registry) {
   };
 }
 
+async function extractQueryAndKeywords(inputText) {
+  const raw = String(inputText || '').trim();
+  if (!raw) return { query: '', keywords: [] };
+
+  const stopwords = new Set([
+    'the','a','an','and','or','of','to','in','on','for','with','without','by','from','as','at','is','are','was','were',
+    'be','been','being','this','that','these','those','it','its','he','she','they','them','his','her','their','patient',
+    'years','year','old','male','female','over','under','age','has','have','had','not','no','yes','can','could','may','might',
+    'will','would','should','must','also','into','than','then','when','while','which','who','whom','what','where','why','how',
+    'full','capacity','conduct','history','scheduled','undergo','plan','treatment','diagnosed','diagnosis'
+  ]);
+
+  if (ALI_LLM_CONFIG.API_KEY) {
+    const prompt = `
+You will receive a long patient condition/description text. Convert it into search terms for retrieving relevant clinical trials.
+
+Rules:
+1) Output STRICT JSON only.
+2) Provide a short query string (<= 120 characters).
+3) Provide 6-12 keywords, prioritize diseases, organs, interventions, biomarkers, drug/radiotracer names.
+4) Keywords should be short phrases.
+
+Input:
+${raw}
+
+Output JSON format:
+{ "query": "...", "keywords": ["...", "..."] }
+`;
+
+    try {
+      const completion = await aiClient.chat.completions.create({
+        model: ALI_LLM_CONFIG.MODEL,
+        messages: [
+          { role: 'system', content: 'You extract search queries and keywords. Output only valid JSON.' },
+          { role: 'user', content: prompt },
+        ],
+        response_format: { type: 'json_object' },
+      });
+
+      const content = String(completion.choices?.[0]?.message?.content || '')
+        .replace(/```json/g, '')
+        .replace(/```/g, '')
+        .trim();
+      const parsed = JSON.parse(content || '{}');
+      const query = String(parsed.query || '').trim();
+      const keywords = Array.isArray(parsed.keywords)
+        ? parsed.keywords.map((k) => String(k).trim()).filter((k) => k.length > 0)
+        : [];
+      return { query, keywords };
+    } catch (_e) {
+      return { query: '', keywords: [] };
+    }
+  }
+
+  const tokens = winkNlpUtils.string
+    .tokenize0(winkNlpUtils.string.removeExtraSpaces(winkNlpUtils.string.lowerCase(raw)))
+    .map((t) => String(t).replace(/[^a-z0-9\-]/g, ''))
+    .filter((t) => t.length >= 4 && !stopwords.has(t));
+
+  const freq = new Map();
+  tokens.forEach((t) => freq.set(t, (freq.get(t) || 0) + 1));
+
+  const keywords = Array.from(freq.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([t]) => t);
+
+  const query = keywords.slice(0, 6).join(' ');
+  return { query, keywords };
+}
+
 async function matchPatient(ctx) {
   try {
     const { age, gender, condition, isRecruiting, registry } = ctx.request.body;
@@ -81,12 +152,23 @@ async function matchPatient(ctx) {
       };
     }
 
-    // 2. Retrieve candidates for BM25
-    const queryText = String(condition || '').trim();
-    if (queryText) {
+    const conditionText = String(condition || '').trim();
+    const { query: extractedQuery, keywords: extractedKeywords } = await extractQueryAndKeywords(conditionText);
+    const queryText = String(extractedQuery || conditionText).trim();
+
+    const keywords = Array.isArray(extractedKeywords) ? extractedKeywords : [];
+    if (keywords.length > 0) {
+      const orClauses = [];
+      keywords.slice(0, 12).forEach((kw) => {
+        orClauses.push({ conditions: { [Op.like]: `%${kw}%` } });
+        orClauses.push({ study_title: { [Op.like]: `%${kw}%` } });
+      });
+      whereClause[Op.or] = orClauses;
+    } else if (queryText) {
+      const safe = queryText.length > 120 ? queryText.slice(0, 120) : queryText;
       whereClause[Op.or] = [
-        { conditions: { [Op.like]: `%${condition}%` } },
-        { study_title: { [Op.like]: `%${condition}%` } }
+        { conditions: { [Op.like]: `%${safe}%` } },
+        { study_title: { [Op.like]: `%${safe}%` } },
       ];
     }
 
