@@ -1,0 +1,19 @@
+{
+  "canonical_to_synonyms": {
+    "coronary artery disease": ["cad", "coronary", "artery", "disease"],
+    "myocardial infarction": ["mi", "heart attack"],
+    "angina": ["chest pain", "anginal"],
+    "pneumonia": ["respiratory infection", "lung infection"],
+    "diabetes mellitus": ["dm", "diabetes", "type 2 diabetes", "type ii diabetes"],
+    "chronic obstructive pulmonary disease": ["copd"],
+    "pulmonary embolism": ["pe"],
+    "breast cancer": ["brca", "breast carcinoma"],
+    "non-small cell lung cancer": ["nsclc", "lung cancer"],
+    "hypertension": ["htn", "high blood pressure"],
+    "pregnancy": ["pregnant", "gestation"],
+    "lithium": ["li"],
+    "insulin": ["ins"],
+    "metformin": ["met"],
+    "aspirin": ["asa"]
+  }
+}

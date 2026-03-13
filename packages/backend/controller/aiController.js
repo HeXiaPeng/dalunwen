@@ -10,7 +10,7 @@ const { processMessage } = require("../mcp/agent_service");
 
 async function generateProtocol(ctx) {
   try {
-    const { messages } = ctx.request.body;
+    const { messages, model } = ctx.request.body;
 
     if (!messages || !Array.isArray(messages)) {
       ctx.status = 400;
@@ -19,7 +19,7 @@ async function generateProtocol(ctx) {
     }
 
     const completion = await aiClient.chat.completions.create({
-      model: ALI_LLM_CONFIG.MODEL, // Using qwen-max as seen in previous analysis files
+      model: model || ALI_LLM_CONFIG.MODEL,
       messages: messages,
     });
 
